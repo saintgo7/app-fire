@@ -1,0 +1,3 @@
+/home/ubuntu/fire-safe/build/linux/x64/debug/pdfium-download/CMakeFiles/pdfium-download.dir
+/home/ubuntu/fire-safe/build/linux/x64/debug/pdfium-download/CMakeFiles/edit_cache.dir
+/home/ubuntu/fire-safe/build/linux/x64/debug/pdfium-download/CMakeFiles/rebuild_cache.dir

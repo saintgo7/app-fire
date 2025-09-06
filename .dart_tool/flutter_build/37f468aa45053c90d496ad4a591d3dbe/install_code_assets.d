@@ -1,0 +1,1 @@
+ /home/ubuntu/fire-safe/.dart_tool/flutter_build/37f468aa45053c90d496ad4a591d3dbe/native_assets.json: 

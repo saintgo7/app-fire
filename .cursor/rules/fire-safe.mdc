@@ -1,0 +1,282 @@
+---
+alwaysApply: true
+---
+# .cursorrules
+# 소방점검관리사 앱 개발을 위한 Cursor IDE 규칙
+
+# 프로젝트 정보
+project_name: "Fire Safety Inspector App"
+project_type: "Flutter Mobile Application"
+target_audience: "소방점검관리사 (Fire Safety Inspectors)"
+primary_language: "Korean"
+
+# 코딩 스타일 및 컨벤션
+coding_style:
+  # Dart/Flutter 코딩 스타일
+  - "Flutter 공식 스타일 가이드 준수"
+  - "effective_dart 린트 규칙 적용"
+  - "모든 클래스, 메소드, 변수명은 영어로 작성"
+  - "주석은 한국어로 작성 (// 한국어 주석)"
+  - "문서화 주석은 영어로 작성 (/// English documentation)"
+  - "파일명은 snake_case 사용 (fire_safety_screen.dart)"
+  - "클래스명은 PascalCase 사용 (FireSafetyScreen)"
+  - "변수명은 camelCase 사용 (inspectionResult)"
+  - "상수는 UPPER_SNAKE_CASE 사용 (MAX_INSPECTION_ITEMS)"
+
+# 프로젝트 구조
+project_structure:
+  lib:
+    core:
+      - constants/
+      - utils/
+      - services/
+      - extensions/
+    features:
+      map:
+        - data/
+        - domain/
+        - presentation/
+      inspection:
+        - data/
+        - domain/
+        - presentation/
+      calculation:
+        - data/
+        - domain/
+        - presentation/
+      reporting:
+        - data/
+        - domain/
+        - presentation/
+    shared:
+      - widgets/
+      - models/
+      - providers/
+    main.dart
+
+# 아키텍처 패턴
+architecture:
+  - "Clean Architecture 패턴 적용"
+  - "Provider 패턴을 사용한 상태 관리"
+  - "Repository 패턴을 사용한 데이터 관리"
+  - "Dependency Injection 적용"
+  - "SOLID 원칙 준수"
+
+# 필수 패키지 및 의존성
+dependencies:
+  state_management:
+    - provider: "^6.0.5"
+    - flutter_bloc: "^8.1.4"
+  
+  maps_location:
+    - google_maps_flutter: "^2.5.0"
+    - location: "^5.0.0"
+    - geocoding: "^2.1.0"
+    - geolocator: "^9.0.0"
+  
+  database:
+    - sqflite: "^2.3.0"
+    - hive: "^2.2.3"
+    - hive_flutter: "^1.1.0"
+  
+  networking:
+    - dio: "^5.3.0"
+    - connectivity_plus: "^4.0.0"
+  
+  ui_components:
+    - cupertino_icons: "^1.0.2"
+    - flutter_svg: "^2.0.0"
+    - cached_network_image: "^3.3.0"
+  
+  camera_media:
+    - camera: "^0.10.5"
+    - image_picker: "^1.0.0"
+    - photo_view: "^0.14.0"
+  
+  pdf_documents:
+    - pdf: "^3.10.0"
+    - printing: "^5.11.0"
+    - path_provider: "^2.1.0"
+  
+  permissions:
+    - permission_handler: "^11.0.0"
+  
+  notifications:
+    - flutter_local_notifications: "^15.1.0"
+  
+  calculations:
+    - math_expressions: "^2.4.0"
+  
+  date_time:
+    - intl: "^0.18.0"
+  
+  storage:
+    - shared_preferences: "^2.2.0"
+    - secure_storage: "^4.2.1"
+
+# 개발 우선순위
+development_priorities:
+  1: "사용자 경험 (UX) 최우선"
+  2: "성능 최적화"
+  3: "보안 및 개인정보 보호"
+  4: "법적 컴플라이언스"
+  5: "오프라인 지원"
+  6: "접근성 (Accessibility)"
+
+# UI/UX 가이드라인
+ui_guidelines:
+  design_system: "Material Design 3"
+  color_scheme:
+    primary: "#D32F2F"  # 소방 빨간색
+    secondary: "#FF9800"  # 주황색
+    surface: "#FFFFFF"
+    background: "#F5F5F5"
+    error: "#F44336"
+    warning: "#FF9800"
+    success: "#4CAF50"
+  
+  typography:
+    - "Noto Sans KR 폰트 사용"
+    - "제목: 18sp, Bold"
+    - "본문: 14sp, Regular"
+    - "캡션: 12sp, Regular"
+  
+  spacing:
+    - "기본 패딩: 16dp"
+    - "카드 마진: 8dp"
+    - "버튼 높이: 48dp"
+    - "아이콘 크기: 24dp"
+
+# 코드 생성 규칙
+code_generation_rules:
+  - "모든 새로운 기능은 feature-first 구조로 생성"
+  - "위젯은 StatelessWidget 우선, 필요시에만 StatefulWidget 사용"
+  - "비즈니스 로직은 별도 클래스로 분리"
+  - "모든 네트워크 요청은 try-catch로 에러 처리"
+  - "사용자 입력 검증은 필수"
+  - "메모리 누수 방지를 위한 dispose() 구현"
+  - "테스트 가능한 코드 작성"
+
+# 소방점검 특화 규칙
+fire_safety_specific:
+  inspection_categories:
+    - "소화기 점검 (Fire Extinguisher)"
+    - "옥내소화전 점검 (Indoor Fire Hydrant)"
+    - "자동화재탐지설비 점검 (Automatic Fire Detection System)"
+    - "스프링클러설비 점검 (Sprinkler System)"
+    - "방화문 점검 (Fire Door)"
+    - "비상구 점검 (Emergency Exit)"
+  
+  inspection_status:
+    - "정상 (Normal)"
+    - "불량 (Defective)"
+    - "해당없음 (Not Applicable)"
+    - "점검중 (In Progress)"
+    - "미점검 (Not Inspected)"
+  
+  legal_compliance:
+    - "소방시설법 준수"
+    - "건축법 준수"
+    - "개인정보보호법 준수"
+    - "위치정보보호법 준수"
+  
+  calculation_formulas:
+    - "배치면적 = 대지면적 - 건축면적"
+    - "연면적 = 각 층 바닥면적의 합계"
+    - "건폐율 = 건축면적 / 대지면적 × 100"
+    - "용적률 = 연면적 / 대지면적 × 100"
+
+# 에러 처리 규칙
+error_handling:
+  - "모든 사용자 대상 에러 메시지는 한국어로 표시"
+  - "네트워크 에러는 재시도 옵션 제공"
+  - "권한 거부는 설정 화면 이동 가이드 제공"
+  - "파일 저장 실패는 대체 경로 제시"
+  - "GPS 사용 불가는 수동 입력 옵션 제공"
+
+# 성능 최적화 규칙
+performance_rules:
+  - "리스트는 ListView.builder 사용"
+  - "이미지는 lazy loading 적용"
+  - "지도는 필요시에만 로드"
+  - "대용량 데이터는 pagination 적용"
+  - "메모리 사용량 모니터링"
+  - "앱 시작 시간 최적화"
+
+# 보안 규칙
+security_rules:
+  - "민감한 데이터는 암호화 저장"
+  - "API 키는 환경 변수로 관리"
+  - "사용자 인증 토큰은 secure storage 사용"
+  - "위치 정보는 업무 목적으로만 사용"
+  - "개인정보는 최소한으로 수집"
+
+# 테스트 규칙
+testing_rules:
+  - "모든 비즈니스 로직은 단위 테스트 작성"
+  - "UI 컴포넌트는 위젯 테스트 작성"
+  - "API 호출은 모킹 테스트 작성"
+  - "통합 테스트는 핵심 플로우만 작성"
+  - "테스트 커버리지 80% 이상 유지"
+
+# 국제화 (i18n) 규칙
+internationalization:
+  - "모든 텍스트는 다국어 지원 준비"
+  - "날짜/시간 포맷은 지역별 대응"
+  - "숫자 포맷은 한국 표준 사용"
+  - "주소 체계는 한국 표준 사용"
+
+# 접근성 규칙
+accessibility:
+  - "모든 버튼에 semantic label 추가"
+  - "색상만으로 정보 전달 금지"
+  - "최소 터치 영역 44dp 이상"
+  - "고대비 색상 옵션 제공"
+  - "텍스트 크기 조절 지원"
+
+# 개발자 가이드라인
+developer_guidelines:
+  - "코드 작성 전 주석으로 설계 먼저 작성"
+  - "복잡한 로직은 단계별 주석 추가"
+  - "TODO 주석에는 담당자와 마감일 명시"
+  - "deprecated 기능 사용 금지"
+  - "최신 Flutter 버전 호환성 확인"
+
+# AI 어시스턴트 가이드
+ai_assistant_guide:
+  - "코드 생성 시 위 규칙들을 모두 준수"
+  - "한국어 주석과 영어 코드의 혼용 허용"
+  - "소방 관련 전문 용어 사용 시 한영 병기"
+  - "법적 요구사항 관련 코드는 주석에 근거 법령 명시"
+  - "사용자 경험을 최우선으로 코드 최적화"
+  - "성능에 영향을 주는 코드는 대안 제시"
+
+# 프로젝트 특별 요구사항
+special_requirements:
+  - "오프라인 모드 지원 필수"
+  - "GPS 정확도 5미터 이내"
+  - "사진 품질 최소 1080p"
+  - "PDF 생성 시간 5초 이내"
+  - "앱 시작 시간 3초 이내"
+  - "메모리 사용량 500MB 이하"
+  - "배터리 소모 최소화"
+
+# 코드 리뷰 체크리스트
+code_review_checklist:
+  - "코딩 스타일 가이드 준수 여부"
+  - "에러 처리 적절성"
+  - "메모리 누수 가능성"
+  - "보안 취약점 여부"
+  - "성능 최적화 여부"
+  - "테스트 코드 존재 여부"
+  - "주석 및 문서화 적절성"
+  - "접근성 준수 여부"
+
+# 배포 관련 규칙
+deployment_rules:
+  - "릴리즈 빌드 전 전체 테스트 실행"
+  - "코드 난독화 적용"
+  - "불필요한 권한 제거"
+  - "앱 크기 최적화"
+  - "성능 프로파일링 수행"
+  - "보안 취약점 검사"
