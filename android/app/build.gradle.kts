@@ -24,7 +24,8 @@ android {
         applicationId = "com.example.fire_safety_inspector"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // 소셜 로그인 SDK를 위한 최소 SDK 버전 설정
+        minSdk = 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
