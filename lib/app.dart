@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/theme/app_theme.dart';
 import 'shared/providers/connectivity_provider.dart';
 import 'shared/providers/sync_provider.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -28,8 +29,14 @@ class FireSafetyInspectorApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MaterialApp(
-        title: 'Fire Safety Inspector',
-        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.red),
+        title: '소방 안전 점검',
+        debugShowCheckedModeBanner: false,
+
+        // Material Design 3 테마 적용
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system, // 시스템 설정 따름
+
         initialRoute: '/',
         routes: {
           '/': (_) => const HomeScreen(),
