@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const { testConnection, closePool } = require('./config/database');
 
 // 라우트 import
@@ -12,6 +14,7 @@ const inspectionsRouter = require('./routes/inspections');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const syncRouter = require('./routes/sync');
+const uploadRouter = require('./routes/upload');
 
 // Express 앱 생성
 const app = express();
@@ -87,6 +90,13 @@ app.use('/api/buildings', buildingsRouter);
 app.use('/api/inspections', inspectionsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/sync', syncRouter);
+app.use('/api/upload', uploadRouter);
+
+// Swagger API 문서
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Fire Safety API Docs',
+}));
 
 // ============================================================================
 // 에러 핸들링
