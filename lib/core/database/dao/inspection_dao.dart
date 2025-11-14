@@ -72,6 +72,18 @@ class InspectionDao {
     return maps.map((map) => Inspection.fromMap(map)).toList();
   }
 
+  /// 동기화되지 않은 점검 목록 조회
+  Future<List<Inspection>> getUnsyncedInspections() async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      'inspections',
+      where: 'is_deleted = 0 AND (synced_at IS NULL OR updated_at > synced_at)',
+      orderBy: 'updated_at ASC',
+    );
+
+    return maps.map((map) => Inspection.fromMap(map)).toList();
+  }
+
   /// 점검 업데이트
   Future<int> updateInspection(Inspection inspection) async {
     final db = await _dbHelper.database;
