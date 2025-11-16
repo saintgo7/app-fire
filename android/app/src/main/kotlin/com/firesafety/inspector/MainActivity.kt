@@ -1,4 +1,4 @@
-package com.example.fire_safety_inspector
+package com.firesafety.inspector
 
 import io.flutter.embedding.android.FlutterActivity
 
