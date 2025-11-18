@@ -1,3 +1,4 @@
+import 'package:sqflite/sqflite.dart' as sqflite;
 import '../database_helper.dart';
 import '../models/building.dart';
 
@@ -34,6 +35,16 @@ class BuildingDao {
 
     if (maps.isEmpty) return null;
     return Building.fromMap(maps.first);
+  }
+
+  /// 건물 조회 (String ID)
+  Future<Building?> getBuildingById(String id) async {
+    try {
+      final intId = int.parse(id);
+      return await getBuilding(intId);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// 모든 건물 목록
@@ -123,6 +134,28 @@ class BuildingDao {
     return maps.map((map) => Building.fromMap(map)).toList();
   }
 
+  /// 통합 건물 검색 (이름 + 주소 + 지역)
+  Future<List<Building>> searchBuildings(String query, {String? orderBy}) async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      'buildings',
+      where: '''
+        (building_name LIKE ? OR
+         address_jibun LIKE ? OR
+         address_road LIKE ? OR
+         region_sido LIKE ? OR
+         region_sigungu LIKE ? OR
+         region_dong LIKE ?)
+        AND is_deleted = 0
+      ''',
+      whereArgs: List.filled(6, '%$query%'),
+      orderBy: orderBy ?? 'building_name ASC',
+      limit: 100,
+    );
+
+    return maps.map((map) => Building.fromMap(map)).toList();
+  }
+
   /// 자체점검 대상 건물 목록
   Future<List<Building>> getSelfInspectionBuildings() async {
     final db = await _dbHelper.database;
@@ -184,7 +217,7 @@ class BuildingDao {
   /// 총 건물 수
   Future<int> getBuildingCount() async {
     final db = await _dbHelper.database;
-    return Sqflite.firstIntValue(
+    return sqflite.Sqflite.firstIntValue(
           await db.rawQuery('SELECT COUNT(*) FROM buildings WHERE is_deleted = 0'),
         ) ??
         0;
@@ -240,5 +273,72 @@ class BuildingDao {
     ''');
 
     return maps.map((map) => map['fire_station'] as String).toList();
+  }
+
+  /// 고급 필터링 건물 목록
+  Future<List<Building>> getFilteredBuildings({
+    String? sido,
+    String? sigungu,
+    String? dong,
+    bool? requiresSelfInspection,
+    bool? hasFireEquipment,
+    bool? isApartment,
+    String orderBy = 'building_name ASC',
+  }) async {
+    final db = await _dbHelper.database;
+    final where = <String>['is_deleted = 0'];
+    final whereArgs = <dynamic>[];
+
+    // 지역 필터
+    if (sido != null && sido.isNotEmpty) {
+      where.add('region_sido = ?');
+      whereArgs.add(sido);
+    }
+    if (sigungu != null && sigungu.isNotEmpty) {
+      where.add('region_sigungu = ?');
+      whereArgs.add(sigungu);
+    }
+    if (dong != null && dong.isNotEmpty) {
+      where.add('region_dong = ?');
+      whereArgs.add(dong);
+    }
+
+    // 자체점검 필터
+    if (requiresSelfInspection != null) {
+      where.add('requires_self_inspection = ?');
+      whereArgs.add(requiresSelfInspection ? 'Y' : 'N');
+    }
+
+    // 소방설비 필터
+    if (hasFireEquipment == true) {
+      where.add('(has_sprinkler = ? OR has_smoke_control = ? OR has_water_spray = ?)');
+      whereArgs.addAll(['Y', 'Y', 'Y']);
+    }
+
+    // 아파트 필터
+    if (isApartment != null) {
+      where.add('is_apartment = ?');
+      whereArgs.add(isApartment ? 'Y' : 'N');
+    }
+
+    final maps = await db.query(
+      'buildings',
+      where: where.join(' AND '),
+      whereArgs: whereArgs,
+      orderBy: orderBy,
+    );
+
+    return maps.map((map) => Building.fromMap(map)).toList();
+  }
+
+  /// 삭제된 건물 복구
+  Future<int> restoreBuilding(int id) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'buildings',
+      {'is_deleted': 0, 'updated_at': DateTime.now().toIso8601String()},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

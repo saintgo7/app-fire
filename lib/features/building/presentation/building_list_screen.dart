@@ -22,6 +22,18 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
   bool _isLoading = true;
   String _searchQuery = '';
 
+  // 필터 상태
+  String? _filterSido;
+  String? _filterSigungu;
+  String? _filterDong;
+  bool? _filterSelfInspection;
+  bool? _filterHasEquipment;
+  bool? _filterIsApartment;
+
+  // 정렬 상태
+  String _sortBy = '이름순';
+  final List<String> _sortOptions = ['이름순', '최근 등록순', '층수 높은순', '층수 낮은순', '면적 큰순'];
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +52,29 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
     });
 
     try {
-      final buildings = await _buildingDao.getAllBuildings();
+      List<Building> buildings;
+
+      // 검색 쿼리가 있으면 검색, 없으면 필터 적용
+      if (_searchQuery.isNotEmpty) {
+        buildings = await _buildingDao.searchBuildings(
+          _searchQuery,
+          orderBy: _getSortOrderBy(),
+        );
+      } else if (_hasActiveFilters()) {
+        buildings = await _buildingDao.getFilteredBuildings(
+          sido: _filterSido,
+          sigungu: _filterSigungu,
+          dong: _filterDong,
+          requiresSelfInspection: _filterSelfInspection,
+          hasFireEquipment: _filterHasEquipment,
+          isApartment: _filterIsApartment,
+          orderBy: _getSortOrderBy(),
+        );
+      } else {
+        buildings = await _buildingDao.getAllBuildings();
+        _applySorting(buildings);
+      }
+
       setState(() {
         _buildings = buildings;
         _filteredBuildings = buildings;
@@ -61,21 +95,82 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
     }
   }
 
-  void _searchBuildings(String query) {
+  void _searchBuildings(String query) async {
     setState(() {
       _searchQuery = query;
-      if (query.isEmpty) {
-        _filteredBuildings = _buildings;
-      } else {
-        _filteredBuildings = _buildings.where((building) {
-          final nameLower = building.buildingName.toLowerCase();
-          final addressLower = building.fullAddress.toLowerCase();
-          final queryLower = query.toLowerCase();
-          return nameLower.contains(queryLower) ||
-              addressLower.contains(queryLower);
-        }).toList();
-      }
+      _isLoading = true;
     });
+
+    try {
+      if (query.isEmpty) {
+        await _loadBuildings();
+      } else {
+        final buildings = await _buildingDao.searchBuildings(
+          query,
+          orderBy: _getSortOrderBy(),
+        );
+        setState(() {
+          _buildings = buildings;
+          _filteredBuildings = buildings;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('검색 실패: $e'),
+            backgroundColor: AppColors.errorLight,
+          ),
+        );
+      }
+    }
+  }
+
+  bool _hasActiveFilters() {
+    return _filterSido != null ||
+        _filterSigungu != null ||
+        _filterDong != null ||
+        _filterSelfInspection != null ||
+        _filterHasEquipment != null ||
+        _filterIsApartment != null;
+  }
+
+  String _getSortOrderBy() {
+    switch (_sortBy) {
+      case '최근 등록순':
+        return 'created_at DESC';
+      case '층수 높은순':
+        return 'floor_above DESC';
+      case '층수 낮은순':
+        return 'floor_above ASC';
+      case '면적 큰순':
+        return 'total_area DESC';
+      default:
+        return 'building_name ASC';
+    }
+  }
+
+  void _applySorting(List<Building> buildings) {
+    switch (_sortBy) {
+      case '최근 등록순':
+        buildings.sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
+        break;
+      case '층수 높은순':
+        buildings.sort((a, b) => b.floorAbove.compareTo(a.floorAbove));
+        break;
+      case '층수 낮은순':
+        buildings.sort((a, b) => a.floorAbove.compareTo(b.floorAbove));
+        break;
+      case '면적 큰순':
+        buildings.sort((a, b) => (b.totalArea ?? 0).compareTo(a.totalArea ?? 0));
+        break;
+      default:
+        buildings.sort((a, b) => a.buildingName.compareTo(b.buildingName));
+    }
   }
 
   @override
@@ -88,15 +183,54 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
           style: AppTextStyles.titleLarge,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            tooltip: '필터',
-            onPressed: () {
-              // TODO: 필터 기능
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('필터 기능 (준비 중)')),
-              );
+          // 정렬 버튼
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort),
+            tooltip: '정렬',
+            onSelected: (String value) {
+              setState(() {
+                _sortBy = value;
+              });
+              _loadBuildings();
             },
+            itemBuilder: (context) => _sortOptions.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Row(
+                  children: [
+                    if (choice == _sortBy)
+                      Icon(Icons.check, size: 20, color: AppColors.primaryLight)
+                    else
+                      const SizedBox(width: 20),
+                    const SizedBox(width: 8),
+                    Text(choice),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+          // 필터 버튼
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                tooltip: '필터',
+                onPressed: _showFilterDialog,
+              ),
+              if (_hasActiveFilters())
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: AppColors.errorLight,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -532,6 +666,188 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// 필터 다이얼로그
+  void _showFilterDialog() {
+    // 다이얼로그용 임시 상태
+    String? tempSido = _filterSido;
+    String? tempSigungu = _filterSigungu;
+    String? tempDong = _filterDong;
+    bool? tempSelfInspection = _filterSelfInspection;
+    bool? tempHasEquipment = _filterHasEquipment;
+    bool? tempIsApartment = _filterIsApartment;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.filter_list, color: AppColors.primaryLight),
+              const SizedBox(width: 12),
+              Text(
+                '필터',
+                style: AppTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 자체점검 대상
+                SwitchListTile(
+                  title: Text(
+                    '자체점검 대상만 표시',
+                    style: AppTextStyles.bodyMedium,
+                  ),
+                  value: tempSelfInspection == true,
+                  onChanged: (value) {
+                    setDialogState(() {
+                      tempSelfInspection = value ? true : null;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+                const Divider(),
+
+                // 소방설비 보유
+                SwitchListTile(
+                  title: Text(
+                    '소방설비 보유 건물만',
+                    style: AppTextStyles.bodyMedium,
+                  ),
+                  value: tempHasEquipment == true,
+                  onChanged: (value) {
+                    setDialogState(() {
+                      tempHasEquipment = value ? true : null;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                ),
+                const Divider(),
+
+                // 아파트
+                CheckboxListTile(
+                  title: Text(
+                    '아파트만 표시',
+                    style: AppTextStyles.bodyMedium,
+                  ),
+                  value: tempIsApartment == true,
+                  onChanged: (value) {
+                    setDialogState(() {
+                      tempIsApartment = value;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+
+                const SizedBox(height: 16),
+                Text(
+                  '지역',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.primaryLight,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // 시/도 선택
+                FutureBuilder<List<String>>(
+                  future: _buildingDao.getRegionSidos(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) return const SizedBox.shrink();
+                    return DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: '시/도',
+                        isDense: true,
+                      ),
+                      value: tempSido,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('전체'),
+                        ),
+                        ...snapshot.data!.map((sido) => DropdownMenuItem(
+                              value: sido,
+                              child: Text(sido),
+                            )),
+                      ],
+                      onChanged: (value) {
+                        setDialogState(() {
+                          tempSido = value;
+                          tempSigungu = null;
+                          tempDong = null;
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setDialogState(() {
+                  tempSido = null;
+                  tempSigungu = null;
+                  tempDong = null;
+                  tempSelfInspection = null;
+                  tempHasEquipment = null;
+                  tempIsApartment = null;
+                });
+              },
+              child: Text(
+                '초기화',
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: AppColors.onSurfaceVariantLight,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                '취소',
+                style: AppTextStyles.labelLarge,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _filterSido = tempSido;
+                  _filterSigungu = tempSigungu;
+                  _filterDong = tempDong;
+                  _filterSelfInspection = tempSelfInspection;
+                  _filterHasEquipment = tempHasEquipment;
+                  _filterIsApartment = tempIsApartment;
+                });
+                _loadBuildings();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryLight,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                '적용',
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -122,8 +122,51 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
 
               if (confirm == true && mounted) {
                 try {
-                  await _buildingDao.deleteBuilding(widget.buildingId);
+                  final intId = int.tryParse(widget.buildingId);
+                  if (intId == null) {
+                    throw Exception('잘못된 건물 ID');
+                  }
+
+                  await _buildingDao.deleteBuilding(intId);
+
                   if (mounted) {
+                    // 삭제 성공 시 실행 취소 가능한 SnackBar 표시
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${_building?.buildingName} 건물이 삭제되었습니다',
+                        ),
+                        backgroundColor: AppColors.statusGood,
+                        duration: const Duration(seconds: 4),
+                        action: SnackBarAction(
+                          label: '실행 취소',
+                          textColor: Colors.white,
+                          onPressed: () async {
+                            try {
+                              await _buildingDao.restoreBuilding(intId);
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${_building?.buildingName} 복구 완료'),
+                                    backgroundColor: AppColors.statusGood,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('복구 실패: $e'),
+                                    backgroundColor: AppColors.errorLight,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    );
                     Navigator.pop(context, true); // Return to list
                   }
                 } catch (e) {
