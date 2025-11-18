@@ -246,14 +246,34 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
               const SizedBox(height: 32),
 
               // 저장 버튼
-              SizedBox(
+              Container(
                 width: double.infinity,
-                height: 56,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryLight,
+                      AppColors.primaryLight.withOpacity(0.85),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryLight.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveBuilding,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor: Colors.transparent,
                     foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: _isSaving
                       ? const SizedBox(
@@ -264,11 +284,23 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : Text(
-                          isEdit ? '수정 완료' : '추가 완료',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: Colors.white,
-                          ),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isEdit ? Icons.check_circle : Icons.add_circle,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              isEdit ? '수정 완료' : '추가 완료',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ),
@@ -280,8 +312,42 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
   }
 
   Widget _buildSectionTitle(String title, {bool required = false}) {
+    IconData icon;
+    switch (title) {
+      case '기본 정보':
+        icon = Icons.info_outline;
+        break;
+      case '위치 정보':
+        icon = Icons.location_on_outlined;
+        break;
+      case '소방 설비':
+        icon = Icons.local_fire_department_outlined;
+        break;
+      case '관리 정보':
+        icon = Icons.admin_panel_settings_outlined;
+        break;
+      case '담당자 정보':
+        icon = Icons.person_outline;
+        break;
+      default:
+        icon = Icons.info_outline;
+    }
+
     return Row(
       children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: AppColors.primaryLight,
+          ),
+        ),
+        const SizedBox(width: 12),
         Text(
           title,
           style: AppTextStyles.titleMedium.copyWith(
@@ -290,22 +356,46 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
           ),
         ),
         if (required) ...[
-          const SizedBox(width: 4),
-          Text(
-            '*',
-            style: AppTextStyles.titleMedium.copyWith(
-              color: AppColors.errorLight,
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.errorLight.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '필수',
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.errorLight,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            height: 2,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primaryLight.withOpacity(0.3),
+                  AppColors.primaryLight.withOpacity(0.0),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildBasicInfoSection() {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextFormField(
@@ -418,8 +508,10 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
 
   Widget _buildLocationSection() {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextFormField(
@@ -499,8 +591,10 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
 
   Widget _buildFireEquipmentSection() {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             SwitchListTile(
@@ -582,8 +676,10 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
 
   Widget _buildManagementSection() {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextFormField(
@@ -637,8 +733,10 @@ class _BuildingFormScreenState extends State<BuildingFormScreen> {
 
   Widget _buildContactSection() {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextFormField(

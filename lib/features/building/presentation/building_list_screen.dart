@@ -176,39 +176,36 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
         _buildings.where((b) => b.hasAnyFireEquipment).length;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildStatItem(
-                  label: '전체',
-                  value: '$totalCount',
-                  color: AppColors.secondaryLight,
-                  icon: Icons.apartment,
-                ),
-              ),
-              Expanded(
-                child: _buildStatItem(
-                  label: '자체점검',
-                  value: '$selfInspectionCount',
-                  color: AppColors.tertiaryLight,
-                  icon: Icons.assignment,
-                ),
-              ),
-              Expanded(
-                child: _buildStatItem(
-                  label: '소방설비',
-                  value: '$hasEquipmentCount',
-                  color: AppColors.statusGood,
-                  icon: Icons.local_fire_department,
-                ),
-              ),
-            ],
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatItem(
+              label: '전체',
+              value: '$totalCount',
+              color: AppColors.secondaryLight,
+              icon: Icons.apartment,
+            ),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatItem(
+              label: '자체점검',
+              value: '$selfInspectionCount',
+              color: AppColors.tertiaryLight,
+              icon: Icons.assignment,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatItem(
+              label: '소방설비',
+              value: '$hasEquipmentCount',
+              color: AppColors.statusGood,
+              icon: Icons.local_fire_department,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -219,25 +216,59 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
     required Color color,
     required IconData icon,
   }) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: AppTextStyles.titleLarge.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [
+              color.withOpacity(0.15),
+              color.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.onSurfaceVariantLight,
-          ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: AppTextStyles.titleLarge.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.onSurfaceVariantLight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -258,8 +289,16 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
 
   /// 건물 카드
   Widget _buildBuildingCard(Building building) {
+    final accentColor = building.requiresSelfInspection == 'Y'
+        ? AppColors.tertiaryLight
+        : AppColors.secondaryLight;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: InkWell(
         onTap: () async {
           final result = await Navigator.push<bool>(
@@ -274,98 +313,154 @@ class _BuildingListScreenState extends State<BuildingListScreen> {
             _loadBuildings(); // Reload the list after deletion or update
           }
         },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 건물명 및 카테고리
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      building.buildingName,
-                      style: AppTextStyles.inspectionItemTitle,
-                    ),
-                  ),
-                  if (building.requiresSelfInspection == 'Y')
-                    Chip(
-                      label: Text(
-                        '자체점검',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.tertiaryLight,
-                        ),
-                      ),
-                      backgroundColor: AppColors.tertiaryLight.withOpacity(0.1),
-                      side: BorderSide.none,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                ],
+        borderRadius: BorderRadius.circular(16),
+        child: Row(
+          children: [
+            // 좌측 액센트 바
+            Container(
+              width: 6,
+              height: 120,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
               ),
-              const SizedBox(height: 8),
-
-              // 주소
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: AppColors.onSurfaceVariantLight,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      building.fullAddress,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.onSurfaceVariantLight,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // 건물 정보
-              Row(
-                children: [
-                  _buildInfoBadge(
-                    icon: Icons.layers,
-                    text: '${building.floorAbove}층',
-                  ),
-                  const SizedBox(width: 8),
-                  if (building.totalArea != null)
-                    _buildInfoBadge(
-                      icon: Icons.square_foot,
-                      text: '${building.totalArea!.toStringAsFixed(0)}㎡',
-                    ),
-                  const SizedBox(width: 8),
-                  if (building.isApartment == 'Y')
-                    _buildInfoBadge(
-                      icon: Icons.home,
-                      text: '아파트',
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // 소방 설비
-              if (building.hasAnyFireEquipment)
-                Wrap(
-                  spacing: 4,
+            ),
+            // 카드 내용
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (building.hasSprinkler == 'Y')
-                      _buildEquipmentChip('스프링클러'),
-                    if (building.hasSmokeControl == 'Y')
-                      _buildEquipmentChip('연기제어'),
-                    if (building.hasWaterSpray == 'Y')
-                      _buildEquipmentChip('물분무'),
+                    // 건물명 및 카테고리
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.apartment,
+                          color: accentColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            building.buildingName,
+                            style: AppTextStyles.inspectionItemTitle.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (building.requiresSelfInspection == 'Y')
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiaryLight.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.tertiaryLight.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Text(
+                              '자체점검',
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.tertiaryLight,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // 주소
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: AppColors.onSurfaceVariantLight,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            building.fullAddress,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.onSurfaceVariantLight,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // 건물 정보 및 소방 설비
+                    Row(
+                      children: [
+                        _buildInfoBadge(
+                          icon: Icons.layers,
+                          text: '${building.floorAbove}층',
+                        ),
+                        const SizedBox(width: 8),
+                        if (building.totalArea != null)
+                          _buildInfoBadge(
+                            icon: Icons.square_foot,
+                            text: '${building.totalArea!.toStringAsFixed(0)}㎡',
+                          ),
+                        const SizedBox(width: 8),
+                        if (building.isApartment == 'Y')
+                          _buildInfoBadge(
+                            icon: Icons.home,
+                            text: '아파트',
+                          ),
+                        const Spacer(),
+                        if (building.hasAnyFireEquipment)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.statusGood.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.local_fire_department,
+                                  size: 14,
+                                  color: AppColors.statusGood,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '설비 ${[
+                                    building.hasSprinkler == 'Y',
+                                    building.hasSmokeControl == 'Y',
+                                    building.hasWaterSpray == 'Y',
+                                  ].where((e) => e).length}',
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    color: AppColors.statusGood,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

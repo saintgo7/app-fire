@@ -220,26 +220,80 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.titleMedium.copyWith(
-        color: AppColors.primaryLight,
-        fontWeight: FontWeight.bold,
-      ),
+    IconData icon;
+    switch (title) {
+      case '기본 정보':
+        icon = Icons.info_outline;
+        break;
+      case '위치 정보':
+        icon = Icons.location_on_outlined;
+        break;
+      case '소방 설비':
+        icon = Icons.local_fire_department_outlined;
+        break;
+      case '관리 정보':
+        icon = Icons.admin_panel_settings_outlined;
+        break;
+      case '담당자 정보':
+        icon = Icons.person_outline;
+        break;
+      default:
+        icon = Icons.info_outline;
+    }
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: AppColors.primaryLight,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: AppColors.primaryLight,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            height: 2,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primaryLight.withOpacity(0.3),
+                  AppColors.primaryLight.withOpacity(0.0),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildHeaderCard(Building building) {
     return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: [
               AppColors.primaryLight,
-              AppColors.primaryLight.withOpacity(0.8),
+              AppColors.primaryLight.withOpacity(0.85),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -288,8 +342,10 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
 
   Widget _buildBasicInfoCard(Building building) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildInfoRow(
@@ -343,8 +399,10 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
 
   Widget _buildLocationCard(Building building) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildInfoRow(
@@ -384,98 +442,127 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
   }
 
   Widget _buildFireEquipmentCard(Building building) {
-    final equipmentList = <Map<String, dynamic>>[];
-
-    if (building.hasSprinkler == 'Y') {
-      equipmentList.add({
+    final equipmentList = <Map<String, dynamic>>[
+      {
         'icon': Icons.water_drop,
         'name': '스프링클러',
         'color': AppColors.equipmentSprinkler,
-      });
-    }
-    if (building.hasSmokeControl == 'Y') {
-      equipmentList.add({
+        'hasEquipment': building.hasSprinkler == 'Y',
+      },
+      {
         'icon': Icons.air,
         'name': '연기제어설비',
         'color': AppColors.equipmentAlarm,
-      });
-    }
-    if (building.hasWaterSpray == 'Y') {
-      equipmentList.add({
+        'hasEquipment': building.hasSmokeControl == 'Y',
+      },
+      {
         'icon': Icons.shower,
         'name': '물분무소화설비',
         'color': AppColors.statusGood,
-      });
-    }
+        'hasEquipment': building.hasWaterSpray == 'Y',
+      },
+    ];
 
-    if (equipmentList.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: Text(
-              '등록된 소방 설비가 없습니다',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.onSurfaceVariantLight,
-              ),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.5,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: equipmentList.length,
+      itemBuilder: (context, index) {
+        final equipment = equipmentList[index];
+        final hasEquipment = equipment['hasEquipment'] as bool;
+        final color = equipment['color'] as Color;
+
+        return Card(
+          elevation: hasEquipment ? 3 : 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: hasEquipment
+                  ? color.withOpacity(0.3)
+                  : AppColors.onSurfaceVariantLight.withOpacity(0.1),
+              width: hasEquipment ? 2 : 1,
             ),
           ),
-        ),
-      );
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: equipmentList.asMap().entries.map((entry) {
-            final index = entry.key;
-            final equipment = entry.value;
-
-            return Column(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: hasEquipment
+                  ? LinearGradient(
+                      colors: [
+                        color.withOpacity(0.1),
+                        color.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (index > 0) const Divider(height: 24),
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: (equipment['color'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        equipment['icon'] as IconData,
-                        color: equipment['color'] as Color,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        equipment['name'] as String,
-                        style: AppTextStyles.bodyLarge,
-                      ),
-                    ),
-                    Icon(
-                      Icons.check_circle,
-                      color: AppColors.statusGood,
-                      size: 24,
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: hasEquipment
+                        ? color.withOpacity(0.2)
+                        : AppColors.onSurfaceVariantLight.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    equipment['icon'] as IconData,
+                    color: hasEquipment
+                        ? color
+                        : AppColors.onSurfaceVariantLight.withOpacity(0.5),
+                    size: 28,
+                  ),
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  equipment['name'] as String,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: hasEquipment
+                        ? color
+                        : AppColors.onSurfaceVariantLight,
+                    fontWeight: hasEquipment ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                if (hasEquipment)
+                  Icon(
+                    Icons.check_circle,
+                    color: color,
+                    size: 16,
+                  )
+                else
+                  Icon(
+                    Icons.remove_circle_outline,
+                    color: AppColors.onSurfaceVariantLight.withOpacity(0.3),
+                    size: 16,
+                  ),
               ],
-            );
-          }).toList(),
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildManagementCard(Building building) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             if (building.fireStationName != null) ...[
@@ -515,8 +602,10 @@ class _BuildingDetailScreenState extends State<BuildingDetailScreen> {
 
   Widget _buildContactCard(Building building) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             if (building.managerName != null) ...[
