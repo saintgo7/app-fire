@@ -13,6 +13,9 @@ import 'features/schedule/presentation/schedule_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'features/legal/presentation/legal_screen.dart';
 import 'features/inspection/presentation/inspection_screen.dart';
+import 'features/building/presentation/building_list_screen.dart';
+import 'features/building/presentation/building_detail_screen.dart';
+import 'features/building/presentation/building_form_screen.dart';
 
 class FireSafetyInspectorApp extends StatelessWidget {
   const FireSafetyInspectorApp({super.key});
@@ -47,6 +50,7 @@ class FireSafetyInspectorApp extends StatelessWidget {
           '/settings': (_) => const SettingsScreen(),
           '/legal': (_) => const LegalScreen(),
           '/inspection': (_) => const InspectionScreen(),
+          '/buildings': (_) => const BuildingListScreen(),
         },
       ),
     );

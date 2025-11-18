@@ -304,12 +304,7 @@ class HomeScreen extends StatelessWidget {
           icon: Icons.apartment,
           label: '건물 관리',
           color: AppColors.tertiaryLight,
-          onTap: () {
-            // TODO: 건물 목록 화면으로 이동
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('건물 관리 화면 (준비 중)')),
-            );
-          },
+          onTap: () => Navigator.pushNamed(context, '/buildings'),
         ),
         _buildQuickActionCard(
           context,
