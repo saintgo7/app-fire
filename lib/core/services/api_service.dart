@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/environment.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -8,10 +9,15 @@ class ApiService {
   late Dio _dio;
   String? _token;
 
-  // API Base URL - 환경에 따라 변경 필요
-  static const String baseUrl = 'http://localhost:3000/api';
+  // API Base URL - 환경별 자동 설정
+  static String get baseUrl => Environment.apiBaseUrl;
 
   ApiService._internal() {
+    // 환경 정보 출력
+    if (Environment.enableDebugLog) {
+      Environment.printEnvironmentInfo();
+    }
+
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -32,16 +38,22 @@ class ApiService {
           if (_token != null) {
             options.headers['Authorization'] = 'Bearer $_token';
           }
-          print('🔵 [REQUEST] ${options.method} ${options.path}');
+          if (Environment.enableDebugLog) {
+            print('🔵 [REQUEST] ${options.method} ${options.path}');
+          }
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print('🟢 [RESPONSE] ${response.statusCode} ${response.requestOptions.path}');
+          if (Environment.enableDebugLog) {
+            print('🟢 [RESPONSE] ${response.statusCode} ${response.requestOptions.path}');
+          }
           return handler.next(response);
         },
         onError: (error, handler) {
-          print('🔴 [ERROR] ${error.response?.statusCode} ${error.requestOptions.path}');
-          print('🔴 [ERROR MESSAGE] ${error.message}');
+          if (Environment.enableDebugLog) {
+            print('🔴 [ERROR] ${error.response?.statusCode} ${error.requestOptions.path}');
+            print('🔴 [ERROR MESSAGE] ${error.message}');
+          }
           return handler.next(error);
         },
       ),
