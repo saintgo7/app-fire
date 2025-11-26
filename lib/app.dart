@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/theme/app_theme.dart';
 import 'shared/providers/connectivity_provider.dart';
 import 'shared/providers/sync_provider.dart';
+import 'shared/widgets/auth_wrapper.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/home/presentation/home_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
@@ -28,11 +30,24 @@ class FireSafetyInspectorApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MaterialApp(
-        title: 'Fire Safety Inspector',
-        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.red),
-        initialRoute: '/',
+        title: '소방점검관리사',
+        theme: AppTheme.lightTheme,
+        // 접근성 및 사용성 최적화
+        debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          // 텍스트 크기 조절 지원
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(
+                MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.5),
+              ),
+            ),
+            child: child!,
+          );
+        },
+        home: const AuthWrapper(),
         routes: {
-          '/': (_) => const HomeScreen(),
+          '/home': (_) => const HomeScreen(),
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
           '/report': (_) => const ReportScreen(),

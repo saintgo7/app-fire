@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 import 'dart:io';
-import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart' as share_plus;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -110,7 +110,7 @@ class _ReportBody extends StatelessWidget {
           final dir = await getTemporaryDirectory();
           final file = File('${dir.path}/report.pdf');
           await file.writeAsBytes(pdfData);
-          await Share.shareXFiles([XFile(file.path)], text: '소방시설 점검 보고서');
+          await share_plus.Share.shareXFiles([share_plus.XFile(file.path)], text: '소방시설 점검 보고서');
         },
       ),
     );

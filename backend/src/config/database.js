@@ -8,7 +8,7 @@ const pool = mariadb.createPool({
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'fire_safety_db',
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
-  timezone: 'Asia/Seoul',
+  timezone: '+09:00', // Asia/Seoul = UTC+9
   charset: 'utf8mb4',
   // 연결 옵션
   connectTimeout: 10000,

@@ -7,7 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/inspection_form_provider.dart';
+import '../../../core/constants/app_spacing.dart';
 import '../../../shared/models/checklist_item.dart';
+import '../../../shared/widgets/status_chip.dart';
+import '../../../shared/widgets/app_card.dart';
 
 class InspectionScreen extends StatelessWidget {
   const InspectionScreen({super.key});
@@ -69,86 +72,134 @@ class _InspectionFormBody extends StatelessWidget {
               itemCount: provider.items.length,
               itemBuilder: (context, index) {
                 final item = provider.items[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item.title,
-                            style: Theme.of(context).textTheme.titleMedium),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          children: ChecklistStatus.values.map((status) {
-                            final selected = item.status == status;
-                            return ChoiceChip(
-                              label: Text(_statusLabel(status)),
-                              selected: selected,
-                              onSelected: (_) =>
-                                  provider.setStatus(index, status),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.camera_alt),
-                              onPressed: () async {
-                                final photo = await picker.pickImage(
-                                    source: ImageSource.camera,
-                                    imageQuality: 90);
-                                if (photo != null) {
-                                  provider.addPhoto(index, photo);
-                                }
-                              },
+                return AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.title,
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.photo_library),
-                              onPressed: () async {
-                                final photo = await picker.pickImage(
-                                    source: ImageSource.gallery,
-                                    imageQuality: 90);
-                                if (photo != null) {
-                                  provider.addPhoto(index, photo);
-                                }
-                              },
-                            ),
-                            Expanded(
-                              child: SizedBox(
-                                height: 60,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: item.photos
-                                      .map((p) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(right: 4),
-                                            child: Image.file(
-                                              File(p.path),
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ))
-                                      .toList(),
+                          ),
+                          Text(
+                            '${index + 1}/${provider.items.length}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        TextField(
-                          decoration: const InputDecoration(
-                              hintText: '메모 입력', border: OutlineInputBorder()),
-                          maxLines: null,
-                          onChanged: (v) => provider.updateMemo(index, v),
-                          controller: TextEditingController(text: item.memo)
-                            ..selection = TextSelection.collapsed(
-                                offset: item.memo.length),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Wrap(
+                        spacing: AppSpacing.sm,
+                        children: ChecklistStatus.values.map((status) {
+                          final selected = item.status == status;
+                          return StatusChip(
+                            status: status,
+                            selected: selected,
+                            onTap: () => provider.setStatus(index, status),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      // 사진 섹션
+                      Text(
+                        '사진',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              final photo = await picker.pickImage(
+                                source: ImageSource.camera,
+                                imageQuality: 90,
+                              );
+                              if (photo != null && context.mounted) {
+                                provider.addPhoto(index, photo);
+                              }
+                            },
+                            icon: const Icon(Icons.camera_alt),
+                            label: const Text('촬영'),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              final photo = await picker.pickImage(
+                                source: ImageSource.gallery,
+                                imageQuality: 90,
+                              );
+                              if (photo != null && context.mounted) {
+                                provider.addPhoto(index, photo);
+                              }
+                            },
+                            icon: const Icon(Icons.photo_library),
+                            label: const Text('갤러리'),
+                          ),
+                        ],
+                      ),
+                      if (item.photos.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        SizedBox(
+                          height: 80,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: item.photos.length,
+                            itemBuilder: (context, photoIndex) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(item.photos[photoIndex].path),
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close, size: 20),
+                                        color: Colors.white,
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: Colors.black54,
+                                          padding: const EdgeInsets.all(4),
+                                        ),
+                                        onPressed: () {
+                                          provider.removePhoto(index, photoIndex);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
-                    ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextField(
+                        decoration: const InputDecoration(
+                          labelText: '메모',
+                          hintText: '메모를 입력하세요',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
+                        onChanged: (v) => provider.updateMemo(index, v),
+                        controller: TextEditingController(text: item.memo)
+                          ..selection = TextSelection.collapsed(
+                            offset: item.memo.length,
+                          ),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -159,14 +210,4 @@ class _InspectionFormBody extends StatelessWidget {
     );
   }
 
-  String _statusLabel(ChecklistStatus status) {
-    switch (status) {
-      case ChecklistStatus.normal:
-        return '정상';
-      case ChecklistStatus.defective:
-        return '불량';
-      case ChecklistStatus.notApplicable:
-        return '해당없음';
-    }
-  }
 } 

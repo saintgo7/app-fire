@@ -184,10 +184,8 @@ class BuildingDao {
   /// 총 건물 수
   Future<int> getBuildingCount() async {
     final db = await _dbHelper.database;
-    return Sqflite.firstIntValue(
-          await db.rawQuery('SELECT COUNT(*) FROM buildings WHERE is_deleted = 0'),
-        ) ??
-        0;
+    final result = await db.rawQuery('SELECT COUNT(*) FROM buildings WHERE is_deleted = 0');
+    return result.isNotEmpty ? (result.first.values.first as int?) ?? 0 : 0;
   }
 
   /// 지역 목록 (시/도)

@@ -299,4 +299,29 @@ class InspectionFormProvider extends ChangeNotifier {
   List<InspectionPhoto> getPhotosForItem(int itemId) {
     return _photos[itemId] ?? [];
   }
+
+  /// 사진 삭제
+  Future<void> removePhoto(int index, int photoIndex) async {
+    // 레거시 호환
+    if (index < items.length && photoIndex < items[index].photos.length) {
+      items[index].photos.removeAt(photoIndex);
+    }
+
+    // DB 삭제
+    if (_items.isNotEmpty && index < _items.length) {
+      final item = _items[index];
+      final photos = _photos[item.id!] ?? [];
+      
+      if (photoIndex < photos.length) {
+        final photo = photos[photoIndex];
+        if (photo.id != null) {
+          await _dao.deleteInspectionPhoto(photo.id!);
+        }
+        photos.removeAt(photoIndex);
+        _photos[item.id!] = photos;
+      }
+    }
+
+    notifyListeners();
+  }
 } 

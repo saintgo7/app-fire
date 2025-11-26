@@ -8,7 +8,7 @@ class ApiClient {
 
   // API 기본 URL (환경별로 변경)
   static const String baseUrl =
-      String.fromEnvironment('API_URL', defaultValue: 'http://localhost:3000');
+      String.fromEnvironment('API_URL', defaultValue: 'https://fire.abada.co.kr');
 
   ApiClient._init() {
     _dio = Dio(BaseOptions(
