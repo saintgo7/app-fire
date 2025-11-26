@@ -7,6 +7,7 @@ const compression = require('compression');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const { testConnection, closePool } = require('./config/database');
+const path = require('path');
 
 // 라우트 import
 const buildingsRouter = require('./routes/buildings');
@@ -51,6 +52,22 @@ if (process.env.NODE_ENV === 'development') {
 
 // 정적 파일 (업로드된 사진)
 app.use('/uploads', express.static('uploads'));
+
+// 정적 파일 (Flutter Web App)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// SPA 라우팅 처리 (API가 아닌 요청은 index.html 반환)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/api-docs') || req.path.startsWith('/health')) {
+    return next();
+  }
+  // 파일 요청이 아닌 경우에만 index.html 반환 (확장자가 없는 경우)
+  if (!req.path.includes('.')) {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+  } else {
+    next();
+  }
+});
 
 // ============================================================================
 // 헬스체크
