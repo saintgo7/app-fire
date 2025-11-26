@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,17 +28,33 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>fire_safety_inspector</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
   <script>
+    // DEBUG: Global Error Handler to display errors on screen
+    window.onerror = function (message, source, lineno, colno, error) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background: rgba(200, 0, 0, 0.9); color: white; padding: 20px; z-index: 99999; white-space: pre-wrap; font-family: monospace; overflow: auto; max-height: 50%;';
+      div.innerText = 'JS Error: ' + message + '\nLocation: ' + source + ':' + lineno + ':' + colno + '\nStack: ' + (error ? error.stack : 'no stack');
+      document.body.appendChild(div);
+    };
+    window.onunhandledrejection = function (event) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 165, 0, 0.9); color: black; padding: 20px; z-index: 99999; white-space: pre-wrap; font-family: monospace; overflow: auto; max-height: 50%;';
+      div.innerText = 'Promise Rejection: ' + event.reason;
+      document.body.appendChild(div);
+    };
+
     window.flutterConfiguration = {
       renderer: "html",
     };
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>
