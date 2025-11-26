@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// API 클라이언트 (싱글톤)
@@ -7,8 +8,12 @@ class ApiClient {
   late Dio _dio;
 
   // API 기본 URL (환경별로 변경)
-  static const String baseUrl =
-      String.fromEnvironment('API_URL', defaultValue: 'https://fire.abada.co.kr');
+  static String get baseUrl {
+    if (kIsWeb) {
+      return ''; // 웹에서는 상대 경로 사용 (같은 도메인/포트)
+    }
+    return const String.fromEnvironment('API_URL', defaultValue: 'http://fire.abada.co.kr');
+  }
 
   ApiClient._init() {
     _dio = Dio(BaseOptions(
