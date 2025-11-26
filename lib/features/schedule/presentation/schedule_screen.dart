@@ -6,8 +6,8 @@ class ScheduleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Schedule')),
-      body: const Center(child: Text('Schedule Screen Placeholder')),
+      appBar: AppBar(title: const Text('일정 관리')),
+      body: const Center(child: Text('일정 관리 화면')),
     );
   }
 } 

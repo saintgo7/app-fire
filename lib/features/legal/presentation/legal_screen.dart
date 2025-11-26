@@ -6,8 +6,8 @@ class LegalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Legal Info')),
-      body: const Center(child: Text('Legal Screen Placeholder')),
+      appBar: AppBar(title: const Text('법령 정보')),
+      body: const Center(child: Text('법령 정보 화면')),
     );
   }
 } 
