@@ -34,11 +34,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.gstatic.com", "https://www.googleapis.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:", "https://firebasestorage.googleapis.com"],
+      connectSrc: ["'self'", "https://www.googleapis.com", "https://securetoken.googleapis.com", "https://firebasestorage.googleapis.com"],
+      frameSrc: ["'self'", "https://firebase.googleapis.com"],
     },
   },
 }));
