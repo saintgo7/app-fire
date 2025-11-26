@@ -9,6 +9,9 @@ const swaggerSpec = require('./config/swagger');
 const { testConnection, closePool } = require('./config/database');
 const path = require('path');
 
+// BigInt serialization fix
+BigInt.prototype.toJSON = function () { return this.toString() };
+
 // 라우트 import
 const buildingsRouter = require('./routes/buildings');
 const inspectionsRouter = require('./routes/inspections');
