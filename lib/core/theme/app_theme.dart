@@ -42,7 +42,7 @@ class AppTheme {
       ),
 
       // Card theme
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 0,
         margin: const EdgeInsets.all(AppSpacing.cardMargin),
@@ -171,7 +171,7 @@ class AppTheme {
       // Chip theme
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
-        selectedColor: AppColors.primary.withValues(alpha: 0.1),
+        selectedColor: AppColors.primary.withOpacity(0.1),
         labelStyle: AppTypography.body.copyWith(color: AppColors.textPrimary),
         secondaryLabelStyle: AppTypography.body.copyWith(color: AppColors.primary),
         padding: const EdgeInsets.symmetric(

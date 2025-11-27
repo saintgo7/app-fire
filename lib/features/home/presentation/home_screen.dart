@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primary.withOpacity( 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -98,7 +98,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity( 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -111,7 +111,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 '안녕하세요, 관리자님',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Colors.white.withOpacity( 0.9),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -130,7 +130,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: Colors.white.withOpacity( 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -211,12 +211,12 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity( 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.border.withOpacity( 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +227,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withOpacity( 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -335,7 +335,7 @@ class HomeScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity( 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(icon, color: color, size: 28),
@@ -381,10 +381,10 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+            border: Border.all(color: AppColors.border.withOpacity( 0.5)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: Colors.black.withOpacity( 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -466,7 +466,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
+              color: statusColor.withOpacity( 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -498,7 +498,7 @@ class HomeScreen extends StatelessWidget {
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity( 0.05),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -513,7 +513,7 @@ class HomeScreen extends StatelessWidget {
             iconSize: 24,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             duration: const Duration(milliseconds: 400),
-            tabBackgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            tabBackgroundColor: AppColors.primary.withOpacity( 0.1),
             color: AppColors.textDisabled,
             tabs: const [
               GButton(

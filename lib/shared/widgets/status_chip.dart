@@ -23,7 +23,7 @@ class StatusChip extends StatelessWidget {
       label: Text(_getStatusLabel(status)),
       selected: selected,
       onSelected: onTap != null ? (_) => onTap!() : null,
-      selectedColor: _getStatusColor(status).withValues(alpha: 0.2),
+      selectedColor: _getStatusColor(status).withOpacity(0.2),
       checkmarkColor: _getStatusColor(status),
       labelStyle: TextStyle(
         color: selected ? _getStatusColor(status) : null,
